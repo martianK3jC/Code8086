@@ -384,7 +384,7 @@ start:
     int 21h
    
     mov ah, 09h
-    mov bl, 77h ; line white
+    mov bl, 70h ; line white
     mov cx, 1
     int 10h
    
@@ -436,7 +436,7 @@ start:
     int 21h
    
     mov ah, 09h
-    mov bl, 77h ; line white
+    mov bl, 7Fh ; line white
     mov cx, 1
     int 10h
    
@@ -462,7 +462,7 @@ start:
     int 21h
    
     mov ah, 09h
-    mov bl, 77h ; line white
+    mov bl, 7Fh ; line white
     mov cx, 1
     int 10h
    
