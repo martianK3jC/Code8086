@@ -8,11 +8,8 @@
 ; FROG IN LOVE
 .model small
 .stack 100
-.data
-    heart db 0FEh, '♥', '$' ; "♥" symbol, '$' ends the string for AH=09h
 .code
 start:
-
     ;line 1
     mov ah, 02h
     mov dl, 0ah ; newline

@@ -1,9 +1,5 @@
 ; Filename: Exer7.asm
 ; Display with different foreground and background colors
-; College (Yellow)
-; of (Red)
-; Computer (Blue)
-; Studies (Black)
 ; Name: Kesha Jane L. Ceniza
 ; Date: August 22, 2025
 
@@ -15,7 +11,7 @@ start:
 
 
 mov ah, 09h
-mov bl, 6Eh
+mov bl, 60h
 mov cx, 7
 int 10h
 
@@ -57,7 +53,7 @@ mov dl, 0ah
 int 21h
 
 mov ah, 09h
-mov bl, 31h
+mov bl, 46h
 mov cx, 2
 int 10h
 
@@ -79,7 +75,7 @@ mov dl, 0ah
 int 21h
 
 mov ah, 09h
-mov bl, 5Dh
+mov bl, 15h
 mov cx, 8
 int 10h
 

@@ -41,10 +41,11 @@ main1:
     mov ah, 9
     mov dx, offset school
     int 21h
+    
+    mov ah, 09h
+    mov bl, 11h 
+    mov cx, 1 
+    int 10h
 
 .exit
 end
-
-
-
-

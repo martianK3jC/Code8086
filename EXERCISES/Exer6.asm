@@ -177,10 +177,53 @@ mov ah, 02h
 mov dl, 0ah
 int 21h
 
+;- _ + = { } [ ] < ?
+    mov ah, 02h
+    mov dl, '-'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '_'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '+'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '='
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '{'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '}'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '['
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, ']'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '<'
+    int 21h
+    mov dl, ' '
+    int 21h
+    mov dl, '?'
+    int 21h
+    mov dl, 0Ah
+    int 21h
+
 ; ANY 20 SPECIAL SYMBOLS WITH SPACE IN BETWEEN : 
 
 mov ah, 02h
-mov dl, ':'
+mov dl, 01h
 int 21h
 
 mov ah, 02h
@@ -188,7 +231,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, ')'
+mov dl, 02h
 int 21h
 
 mov ah, 02h
@@ -196,7 +239,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '!'
+mov dl, 03h
 int 21h
 
 mov ah, 02h
@@ -204,7 +247,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '@'
+mov dl, 04h
 int 21h
 
 mov ah, 02h
@@ -212,7 +255,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '#'
+mov dl, 05h
 int 21h
 
 mov ah, 02h
@@ -220,7 +263,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '$'
+mov dl, 06h
 int 21h
 
 mov ah, 02h
@@ -228,7 +271,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '&'
+mov dl, 0Eh
 int 21h
 
 mov ah, 02h
@@ -236,7 +279,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '*'
+mov dl, 0Fh
 int 21h
 
 mov ah, 02h
@@ -244,7 +287,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '('
+mov dl, 10h
 int 21h
 
 mov ah, 02h
@@ -252,11 +295,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, ')'
-int 21h
-
-mov ah, 02h
-mov dl, ':'
+mov dl, 1Eh
 int 21h
 
 mov ah, 02h
@@ -264,7 +303,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '~'
+mov dl, 11h
 int 21h
 
 mov ah, 02h
@@ -272,7 +311,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '`'
+mov dl, 12h
 int 21h
 
 mov ah, 02h
@@ -280,7 +319,34 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '\'
+mov dl, 13h
+int 21h
+
+
+mov ah, 02h
+mov dl, ' '
+int 21h
+
+mov ah, 02h
+mov dl, 14h
+int 21h
+
+
+mov ah, 02h
+mov dl, ' '
+int 21h
+
+mov ah, 02h
+mov dl, 15h
+int 21h
+
+
+mov ah, 02h
+mov dl, ' '
+int 21h
+
+mov ah, 02h
+mov dl, 16h
 int 21h
 
 mov ah, 02h
@@ -288,7 +354,15 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '>'
+mov dl, 17h
+int 21h
+
+mov ah, 02h
+mov dl, ' '
+int 21h
+ 
+mov ah, 02h
+mov dl, 1Fh
 int 21h
 
 mov ah, 02h
@@ -296,7 +370,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '<'
+mov dl, 0Bh
 int 21h
 
 mov ah, 02h
@@ -304,7 +378,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, '|'
+mov dl, 1Bh
 int 21h
 
 mov ah, 02h
@@ -312,27 +386,7 @@ mov dl, ' '
 int 21h
 
 mov ah, 02h
-mov dl, ','
-int 21h
-
-mov ah, 02h
-mov dl, ' '
-int 21h
-
-mov ah, 02h
-mov dl, '.'
-int 21h
-
-mov ah, 02h
-mov dl, ' '
-int 21h
-
-mov ah, 02h
-mov dl, '?'
-int 21h
-
-mov ah, 02h
-mov dl, 0ah
+mov dl, 0Ch
 int 21h
 
 

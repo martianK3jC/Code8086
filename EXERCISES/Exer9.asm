@@ -6,8 +6,6 @@
 
 .model small
 .stack 100
-.data
-    heart db 0FEh, '♥', '$' ; "♥" symbol, '$' ends the string for AH=09h
 .code
 start:
 
@@ -18,7 +16,7 @@ start:
 	int 10h
 
     mov ah, 02h
-    mov dl, 'I'    ; I
+    mov dl, 'I'
     int 21h
 
     ; space
@@ -28,28 +26,28 @@ start:
 	int 21h	
 
     mov ah,09h
-	mov bl,84h ;8=blink, 5=purple foreground
+	mov bl,84h 
 	mov cx,1
 	int 10h
 
     mov ah,02h 
-	mov cl,03h ;heart
+	mov cl,03h 
 	mov dl,cl	
 	int 21h	
 
     ; space
     mov ah,02h 
-	mov cl,20h ;space
+	mov cl,20h 
 	mov dl,cl	
 	int 21h	
 
     mov ah, 09h 
 	mov bl, 4Fh 
-	mov cx, 1 ;num of characters to apply color 
+	mov cx, 1  
 	int 10h
 
     mov ah, 02h
-    mov dl, 'U'    ; heart
+    mov dl, 'U'
     int 21h
 
     mov ah, 00h
