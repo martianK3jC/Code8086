@@ -1,7 +1,12 @@
-; Filename: Exer5.asm
-; Description: 
+; Filename: Exer12.asm
+; Description: Print the following strings
+; Firstname Middlename Lastname
+; Bachelor of Science in Computer Science 2nd Year
+; College of Computer Studies
+; Cebu Institute of Technology - University
 ; Name: Kesha Jane L. Ceniza
 ; Date: August 22, 2025
+
 
 .model small
 .data 
