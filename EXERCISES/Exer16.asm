@@ -13,6 +13,8 @@
 inputChar db ? 
 inputMsg db 'Enter a character: $'
 outputMsg db 'You entered: $'
+
+
 .CODE
 CanBeAnyName:
     ;initialize the data segment

@@ -39,7 +39,7 @@ Exer17Code:
     int 21h
 
 EchoLoop:
-    mov ah, 1           ; DOS keyboard input finction
+    mov ah, 1           ; DOS keyboard input function
     int 21h             ; get the next key
 
     cmp al, 13          ; was the key the Enter key?
