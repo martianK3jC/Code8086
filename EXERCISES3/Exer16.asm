@@ -1,4 +1,4 @@
-; Filename: EXER15.ASM
+; Filename: EXER16.ASM
 ; Programmer Name: KESHA JANE L. CENIZA
 ; Date: September 12, 2025
 ; Description: This assembly language program will display multiple string variables on separate lines.

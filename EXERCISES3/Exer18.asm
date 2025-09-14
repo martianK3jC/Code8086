@@ -1,4 +1,4 @@
-; Filename: EXER17.ASM
+; Filename: EXER18.ASM
 ; Programmer Name: Kesha Jane L. Ceniza
 ; Date: September 12, 2025
 ; Description: This assembly language program will continuously get 
