@@ -30,15 +30,15 @@ promptPassword DB ' Enter Password: $'
 outputMessage DB " Please review account registration details below:",13,10,'$'
 
 ; Table structure with proper borders
-tableTop DB ' +---------------+------------------------+', 13, 10, '$'
-tableMid DB ' +---------------+------------------------+', 13, 10, '$'
-tableBot DB ' +---------------+------------------------+', 13, 10, '$'
+tableTop DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
+tableMid DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
+tableBot DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
 
-outputName DB ' | Full Name:    | $'
-outputBirthday DB ' | Birthday:     | $'
-outputGender DB ' | Gender:       | $'
-outputEmail DB ' | Email Address:| $'
-outputPassword DB ' | Password:     | $'
+    outputName DB ' | Full Name:       | $'
+outputBirthday DB ' | Birthday:        | $'
+  outputGender DB ' | Gender:          | $'
+   outputEmail DB ' | Email Address:   | $'
+outputPassword DB ' | Password:        | $'
 
     submitBtn DB " SUBMIT $"
     cancelBtn DB " CANCEL $"
