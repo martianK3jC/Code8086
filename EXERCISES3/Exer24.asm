@@ -7,10 +7,10 @@
 .stack 100h
 
 .data
-    FILENAMEMSG DB 'Filename: Exer24.ASM', 13, 10, '$'
+    FILENAMEMSG DB 'Filename: Exer24.asm', 13, 10, '$'
     PROGRAMMERMSG DB 'Programmer Name: Kesha Jane L. Ceniza', 13, 10, '$'
     DESCRIPTIONMSG DB 'Description: Asks for your first name, middle name, and family name. Then display Hello, FIRST NAME MIDDLE NAME FAMILY NAME!.', 13, 10, '$'
-    DATEMSG DB 'Date Created: September 14, 2024', 13, 10, 13, 10, '$'
+    DATEMSG DB 'Date Created: September 14, 2025', 13, 10, 13, 10, '$'
 
     promptFirstName db 'Enter First Name: $'
     promptMiddleName db 'Enter Middle Name: $'
