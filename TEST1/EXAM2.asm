@@ -1,8 +1,7 @@
-
-; Filename: HandsOnExam.asm
-; Programmer Name: Kesha Jane L. Ceniza
-; Date: September 19, 2025
-; Description: Hands on Exam
+; ; Filename: EXAM2.asm
+; ; Programmer Name: Kesha Jane L. Ceniza
+; ; Date: September 26, 2025
+; ; Description: Hands on Exam
 
 
 .MODEL SMALL
@@ -10,39 +9,45 @@
 .DATA
     FISHBOOKSTRING DB 'FISHBOOK ACCOUNT REGISTRATION', 13, 10, '$'
     PROGRAMMERSMSG DB 'Programmer Name: KESHA JANE L. CENIZA', 13, 10, '$'
-    DESCRIPTIONMSG DB 'Description: Hands on exam', 13, 10, '$'
-    DATEMSG DB 'Date Created: September , 2024', 13, 10, 13, 10, '$'
- fullName DB 50 DUP('$') ; Reserve 50 bytes for input string
- birthday DB 50 DUP('$')
- gender DB 50 DUP('$')
+    DESCRIPTIONMSG DB 'Description: Hands on exam 2', 13, 10, '$'
+    DATEMSG DB 'Date Created: September 26, 2024', 13, 10, 13, 10, '$'
+    
+    fullName DB 50 DUP('$') ; Reserve 50 bytes for input string
+    birthday DB 50 DUP('$')
+    gender DB 50 DUP('$')
+    email DB 50 DUP('$')
+    password DB 50 DUP('$')
+    choice DB 50 DUP('$')
 
-email DB 50 DUP('$')
-password DB 50 DUP('$')
+    colorTable DB ' How do you like to display the summary table?', 13, 10, '$'
+    blueTable DB ' 1 - blue background', 13, 10, '$'
+    redTable DB ' 2 - red background', 13, 10, '$'
+    promptChoice DB ' Enter your choice: $'
 
- promptFullName DB ' Enter Full Name: $'
- promptBirthday DB ' Enter Birthday: $'
- promptGender DB ' Enter Gender: $'
+    promptFullName DB ' Enter Full Name: $'
+    promptBirthday DB ' Enter Birthday: $'
+    promptGender DB ' Enter Gender: $'
+    promptEmail DB ' Enter Email Address: $'
+    promptPassword DB ' Enter Password: $'
 
-;;;;;;;;;;;;;;;
-promptEmail DB ' Enter Email Address: $'
-promptPassword DB ' Enter Password: $'
+    outputMessage DB " Please review account registration details below:",13,10,'$'
 
-outputMessage DB " Please review account registration details below:",13,10,'$'
+    ; Table structure with proper borders
+    tableTop DB '+---------------+------------------------+', 13, 10, '$'
+    tableMid DB '+---------------+------------------------+', 13, 10, '$'
+    tableBot DB '+---------------+------------------------+', 13, 10, '$'
 
-; Table structure with proper borders
-tableTop DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
-tableMid DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
-tableBot DB ' +------------------+---------------------------------------------------------+', 13, 10, '$'
-
-    outputName DB ' | Full Name:       | $'
-outputBirthday DB ' | Birthday:        | $'
-  outputGender DB ' | Gender:          | $'
-   outputEmail DB ' | Email Address:   | $'
-outputPassword DB ' | Password:        | $'
+    outputName DB '| Full Name:    | $'
+    outputBirthday DB '| Birthday:     | $'
+    outputGender DB '| Gender:       | $'
+    outputEmail DB '| Email Address:| $'
+    outputPassword DB '| Password:     | $'
 
     submitBtn DB " SUBMIT $"
     cancelBtn DB " CANCEL $"
     editBtn DB " EDIT $"
+    
+    invalidMsg DB 'INVALID INPUT!', 13, 10, '$'
     
     ; For closing table rows
     tableRowEnd DB ' |', 13, 10, '$'
@@ -58,7 +63,7 @@ MAIN PROC
     mov ax, @data
     mov ds, ax
 
-    ; Display the header information
+    ; Display the header information - THIS WAS MISSING!
     lea dx, FISHBOOKSTRING
     mov ah, 09h
     int 21h
@@ -93,6 +98,7 @@ int 21h
  LEA DX, birthday
  MOV AH, 0Ah ; DOS function to read a string
  INT 21h
+ 
  ; this is for displaying new line
 mov ah,02h
 mov cl,0Ah ; 0Ah is new line
@@ -154,24 +160,85 @@ mov cl,0Ah ; 0Ah is new line
 mov dl,cl
 int 21h
 
- LEA DX, outputMessage
- MOV AH, 09h ; DOS function to display a string
- INT 21h
+; Display color choice menu
+LEA DX, colorTable
+MOV AH, 09h
+int 21h
+
+LEA DX, blueTable
+mov ah, 09h
+int 21h
+
+LEA DX, redTable
+mov ah, 09h
+int 21h
+
+lea dx, promptChoice
+mov ah, 09h
+int 21h
+
+; Read input choice string
+LEA DX, choice
+MOV AH, 0Ah ; DOS function to read a string
+INT 21h
+
+; this is for displaying new line
+mov ah,02h
+mov cl,0Ah ; 0Ah is new line
+mov dl,cl
+int 21h
+
+; Check user choice - compare the actual character entered
+mov al, [choice + 2]  ; Get the first character of input (skip length bytes)
+cmp al, '1'           ; Compare with character '1'
+je blue_choice        ; Jump if equal to '1'
+cmp al, '2'           ; Compare with character '2'  
+je red_choice         ; Jump if equal to '2'
+
+; Invalid input - display error message and exit
+mov ah, 09h
+lea dx, invalidMsg
+int 21h
+jmp button_section    ; Skip table display, go to buttons
+
+blue_choice:
+; Display output message
+LEA DX, outputMessage
+MOV AH, 09h ; DOS function to display a string
+INT 21h
 
 ; Set blue background for table area (next 11 rows)
 mov ah, 06h         ; Scroll window up (clear area)
 mov al, 0           ; Clear entire area
 mov bh, 1Fh         ; Blue background (1) + White text (F)
-mov ch, 9           ; Start row (current position)
+mov ch, 13          ; Start row
 mov cl, 0           ; Start column
-mov dh, 19          ; End row (allow for 11 rows of table)
+mov dh, 23          ; End row
+mov dl, 79          ; End column (full width)
+int 10h
+jmp display_table     ; Jump to table display
+
+red_choice:
+; Display output message
+LEA DX, outputMessage
+MOV AH, 09h ; DOS function to display a string
+INT 21h
+
+; Set red background for table area (next 11 rows)
+mov ah, 06h         ; Scroll window up (clear area)
+mov al, 0           ; Clear entire area
+mov bh, 4Fh         ; Red background (4) + White text (F)
+mov ch, 13          ; Start row
+mov cl, 0           ; Start column
+mov dh, 23          ; End row
 mov dl, 79          ; End column (full width)
 int 10h
 
+display_table:
 ; Position cursor to start of table area
 mov ah, 02h
 mov bh, 0
-mov dh, 9           ; Row 9
+mov dh, 13          ; Row 13
 mov dl, 0           ; Column 0
 int 10h
 
@@ -274,7 +341,7 @@ INT 21h
 mov ah, 06h
 mov al, 0
 mov bh, 07h         ; Normal colors (light gray on black)
-mov ch, 20          ; Start after table
+mov ch, 24          ; Start after table
 mov cl, 0
 mov dh, 24          ; Bottom of screen
 mov dl, 79
@@ -283,10 +350,11 @@ int 10h
 ; Position cursor after table for buttons
 mov ah, 02h
 mov bh, 0
-mov dh, 20
+mov dh, 24          
 mov dl, 0
 int 10h
 
+button_section:
 ;;;;BUUTTTOOONNSS
 ; this is for displaying new line
 mov ah,02h
@@ -344,10 +412,14 @@ mov cl,0Ah ; 0Ah is new line
 mov dl,cl
 int 21h
 
+mov ah, 09h
+mov bl, 00h    ; Red background + White text  
+mov cx, 600
+int 10h
+
 ; Exit program
 MOV AX, 4C00h ; DOS function to terminate program
 INT 21h
 
 MAIN ENDP
 END MAIN
-
