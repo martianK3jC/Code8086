@@ -1,17 +1,24 @@
+;FILENAME: EXER32.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: This assembly language program will input 2 single digit numbers, divide the 2 numbers, and display the quotient of the 2 numbers.
+
 .model small
 .stack 100h
 .data
-    msg1 db 'Enter first number: $'
-    msg2 db 0dh, 0ah, 'Enter second number: $'
+    ;Initializing/defining string variables
+    msg1 db 0dh, 0ah, 'Enter first number(0-9): $'
+    msg2 db 0dh, 0ah, 'Enter second number(1-9): $';Second number cannot be zero
     resultMsg db 0dh, 0ah, 'The result is: $'
+    divByZeroMsg db 0dh, 0ah, 'Cannot divide by 0$'
 
+    ;Declare single-byte variables for user inputs and result (uninitialized)
     num1 db ?
     num2 db ?
     result db ?
-
 .code
 start:
-    ;set up data segment
+    ;Set up data segment
     mov ax, @data
     mov ds, ax
 
@@ -34,11 +41,17 @@ start:
     call read_number
     mov num2, al
 
-    ;SUBTRACTING 2 NUMBERS: NUM1 - NUM2------------------------------------------------------------
-    ;Subtract the second number from the first
+    ; Check for division by zero
+    cmp num2, 0
+    je div_by_zero
+
+    ;DIVIDE 2 NUMBERS: NUM1 / NUM2------------------------------------------------------------
+    ;Divide the second number from the first
     mov al, num1
-    sub al, num2
-    mov result, al
+    xor ah, ah; Clear ah for the division
+    mov bl, num2
+    div bl; AL = AL / BL, quotient in AL, remainder in AH
+    mov result, al; Store the quotient
 
     ;DISPLAYING THE RESULT-------------------------------------------------------------------------
     ;Display the result
@@ -50,6 +63,17 @@ start:
     call print_result
     
     ;EXIT PROGRAM----------------------------------------------------------------------------------
+    mov ax, 4C00h
+    int 21h
+
+;Handling division by 0----------------------------------------------------------------------------
+div_by_zero:
+    ;Handle division by zero (optional: you can display a message)
+    mov ah, 09h
+    lea dx, divByZeroMsg
+    int 21h
+
+    ;Exit program
     mov ax, 4C00h
     int 21h
 
@@ -66,13 +90,9 @@ read_number endp
 print_result proc
     add result, '0'; Convert result to ASCII
     mov ah, 0eh; BIOS teletype output function
-
     mov al, result
     int 10h
     ret
 print_result endp
 
 end start
-
-
-

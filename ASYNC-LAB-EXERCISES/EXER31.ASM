@@ -1,17 +1,23 @@
+;FILENAME: EXER31.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: Input 2 single digit numbers, multiply the two numbers and display the product of the two numbers.
+
 .model small
 .stack 100h
 .data
-    msg1 db 'Enter first number: $'
-    msg2 db 0dh, 0ah, 'Enter second number: $'
+    ;Initializing/defining string variables
+    msg1 db 0dh, 0ah, 'Enter first number(0-9): $'
+    msg2 db 0dh, 0ah, 'Enter second number(0-9): $'
     resultMsg db 0dh, 0ah, 'The result is: $'
 
+    ;Declare single-byte variables for user inputs and result (uninitialized)
     num1 db ?
     num2 db ?
     result db ?
-
 .code
 start:
-    ;set up data segment
+    ;Set up data segment
     mov ax, @data
     mov ds, ax
 
@@ -34,10 +40,11 @@ start:
     call read_number
     mov num2, al
 
-    ;SUBTRACTING 2 NUMBERS: NUM1 - NUM2------------------------------------------------------------
+    ;MULTIPLYING 2 NUMBERS: NUM1 - NUM2------------------------------------------------------------
     ;Subtract the second number from the first
     mov al, num1
-    sub al, num2
+    mov bl, num2
+    mul bl; AL = AL * BL, result in AX
     mov result, al
 
     ;DISPLAYING THE RESULT-------------------------------------------------------------------------
@@ -66,13 +73,9 @@ read_number endp
 print_result proc
     add result, '0'; Convert result to ASCII
     mov ah, 0eh; BIOS teletype output function
-
     mov al, result
     int 10h
     ret
 print_result endp
 
 end start
-
-
-
