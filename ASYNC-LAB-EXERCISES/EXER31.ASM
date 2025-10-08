@@ -40,8 +40,7 @@ start:
     call read_number
     mov num2, al
 
-    ;MULTIPLYING 2 NUMBERS: NUM1 - NUM2------------------------------------------------------------
-    ;Subtract the second number from the first
+    ;MULTIPLYING 2 NUMBERS: NUM1 * NUM2------------------------------------------------------------
     mov al, num1
     mov bl, num2
     mul bl; AL = AL * BL, result in AX

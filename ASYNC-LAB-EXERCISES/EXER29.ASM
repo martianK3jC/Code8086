@@ -17,7 +17,7 @@
 .code
 main proc
     ;initialize data segment
-    mov ax, @DATA; check later, if it does not work -> change to @data
+    mov ax, @DATA; check later, if it does not work -> change to @data... Update: it works!
     mov ds, ax
 
     ;INPUTTING AND READING NUMBER------------------------------------------------------------------

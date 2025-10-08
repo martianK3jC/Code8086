@@ -33,7 +33,7 @@ MAIN PROC
 
     ;Read input first string---1---
     lea dx, inputString1
-    ; mov ah, 0Ah; DOS function to read a string
+    mov ah, 0Ah; DOS function to read a string
     int 21h
 
     ;display new line---1---

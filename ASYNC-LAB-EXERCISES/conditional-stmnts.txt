@@ -1,0 +1,177 @@
+Source: Introduction to Assembly Language Programming From 8086 to Pentium Processors by Sivarama P. Dandamudi.
+---
+
+The **cmp (CoMPare)** instruction is used to compare two operands (equal, not equal, and so on). 
+The **cmp** instruction performs the same operation as the **sub** except that the result of subtraction is not saved. 
+Thus, **cmp** does not disturb both destination and source operands. 
+While both **sub** and **cmp** instructions take the same number of clocks in most cases, **cmp** requires one less if the destination is memory. 
+This is because the **cmp** instruction does not write the result in memory, whereas the **sub** instruction does.
+
+The **cmp** instruction is used in conjunction with conditional jump instructions for decision making. 
+This is the topic of the next section.
+
+---
+
+### **3.5.2 Conditional Execution**
+
+The Pentium instruction set contains several branching and looping instructions to construct programs that require conditional execution. 
+In this section, we will discuss a subset of these instructions. 
+A detailed discussion can be found in Chapter 7.
+
+Program execution, by default, proceeds in a sequential manner—execution of instructions is in the order present in the program. 
+However, programs often require conditional and looping constructs.
+
+---
+
+### **Unconditional Jump**
+
+The unconditional jump instruction **jmp**, as its name implies, 
+tells the processor that the next instruction to be executed is located at the label that is given as a part of the instruction. 
+This jump instruction has the form
+
+```
+jmp label
+```
+
+where **label** identifies the next instruction to be executed. The following example
+
+```
+mov EAX,1
+inc_again:
+inc EAX
+jmp inc_again
+mov EBX,EAX
+```
+
+results in an infinite loop incrementing **EAX** repeatedly. 
+
+The instruction:
+```
+mov EBX,EAX
+```
+and all the instructions following it are never executed!
+
+From this example, the **jmp** instruction appears to be useless. 
+Later, we will show some examples that illustrate the use of this instruction.
+
+---
+
+### **Conditional Jump**
+
+In conditional jump instructions, program execution is transferred to the target instruction only when the specified condition is satisfied. 
+The general format is:
+```
+j<cond> label
+```
+where `<cond>` identifies the condition under which the target instruction at **label** should be executed. 
+Usually, the condition being tested is the result of the last arithmetic/logic operation. 
+
+For example, the following code:
+```
+read_char:
+    mov DL,0
+    .
+    (code for reading a character into AL)
+    .
+    cmp AL,0DH        ; compare the character to CR
+    je  CR_received   ; if equal, jump to CR_received
+    inc CL            ; otherwise, increment CL and
+    jmp read_char     ; go back to read another
+                      ; character from keyboard
+
+CR_received:
+    mov DL,AL
+    .
+```
+
+reads characters from the keyboard until the carriage return (CR) key is pressed.
+The character count is maintained in the **CL** register. 
+
+The two instructions:
+```
+cmp AL,0DH     ; 0DH is ASCII for carriage return
+je  CR_received ; je stands for jump on equal
+```
+perform the required conditional execution. 
+How does the processor remember the result of the previous **cmp** operation when it is executing the **je** instruction? 
+One of the purposes of the **flags register** is to provide such short-term memory between instructions. 
+Let us look at the actions taken by the processor in executing these two instructions.
+
+Remember that the **cmp** instruction subtracts 0DH from the contents of the **AL** register. 
+While the result is not saved anywhere, the operation sets the zero flag (**ZF = 1**) if the two operands are the same. 
+If not, **ZF = 0**. The **ZF** retains this value until another instruction that affects **ZF** is executed. 
+Note that not all instructions affect all the flags. 
+In particular, the **mov** instruction does not affect any of the flags.
+
+Thus, at the time of the **je** instruction execution, 
+the processor checks the **ZF** and program execution jumps to the labeled instruction if and only if **ZF = 1**.
+
+---
+
+To cause the jump, Pentium loads the (E)IP register with the target instruction address. 
+Recall that the (E)IP register always points to the next instruction to be executed. 
+
+Therefore, when the character read is CR, instead of fetching the instruction:
+```
+inc CL
+```
+
+it will fetch the:
+```
+mov DL,AL
+```
+instruction. Here are some of the conditions tested by conditional jump instructions:
+
+| Mnemonic | Meaning                    |
+| -------- | -------------------------- |
+| je       | jump if equal              |
+| jg       | jump if greater            |
+| jl       | jump if less               |
+| jge      | jump if greater or equal   |
+| jle      | jump if less than or equal |
+| jne      | jump if not equal          |
+
+Conditional jumps can also test the values of flags. Some examples are:
+
+| Mnemonic | Meaning                             |
+| -------- | ----------------------------------- |
+| jz       | jump if zero (i.e., if ZF = 1)      |
+| jnz      | jump if not zero (i.e., if ZF = 0)  |
+| jc       | jump if carry (i.e., if CF = 1)     |
+| jnc      | jump if not carry (i.e., if CF = 0) |
+
+---
+
+**Example:**
+Consider the following code. The following table shows the actions taken depending on *statement_1*.
+
+```
+go_back:
+    inc AL
+    .
+    .
+    cmp AL,BL
+statement_1
+    mov BL,77H
+```
+
+---
+
+| **statement_1** | **AL** | **BL** | **Action taken**                                      |
+| --------------- | ------ | ------ | ----------------------------------------------------- |
+| je go_back      | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jg go_back      | 56H    | 55H    | Program control transferred to **inc AL**             |
+| jg go_back      | 56H    | 56H    | No jump; executes the next instruction **mov BL,77H** |
+| jl go_back      | 56H    | 56H    | No jump; executes the next instruction **mov BL,77H** |
+| jle go_back     | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jge go_back     | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jne go_back     | 27H    | 26H    | Program control transferred to **inc AL**             |
+| jg go_back      |        |        |                                                       |
+| jge go_back     |        |        |                                                       |
+
+---
+The conditional jump instructions assume that the operands compared were treated as signed numbers. 
+There is another set of conditional jump instructions for operands that are unsigned numbers. 
+But until these instructions are discussed in Chapter 7, 
+the six conditional jump instructions introduced here are sufficient for writing simple assembly language programs.
+---

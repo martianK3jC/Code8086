@@ -1,0 +1,999 @@
+I am coding using assembly language in VSCode. I use the extension: MASM/TASM by clcxsrolau.
+Basic support for MASM/TASM v1.x
+Chinese|English| 中文 in gitee
+Basic language support for assembly in DOS environment. may be suitable for studying MASM/TASM in DOSBox or courses like principles& peripheral technology of microprocessor.
+* Language Support: Offer grammar,basic outline view,hover,code formate support for DOS assembly language
+* Run and debug: Right click on the VSCode editor panel, run and debug your code
+* Diagnose: process the output of ASM tools and display them in VSCode
+* support all platform including Web, see platform support
+* Note: this extension is built for learning assembly in DOS, it can not work with assembly for win32
+Demo
+Demo 1: Language Features
+Formate CodesDiagnose
+The extension offers some language features like "hover","formate","jump to definition" as language id assembly. You can also use other extension for Assembly language Support, for example language ID asm-collection by installing extension ASM Code Lens.
+Demo 2: Run and Debug
+using TASM via DOSBoxusing MASM via msdos-player
+when you are editing assembly files ,you can right click at the editor panel,then you will see several choices listed below:
+1. Open Emulator: Open the dosbox, prepare the environment
+2. Run ASM code: Assemble,link and Run the program
+3. Debug ASM code: Assemble,link and Debug the program
+RunDebug Notes
+* If your code just in a single file, set configuration masmtasm.ASM.mode as single file. The extension will copy your file to a seperate space in your machine to keep your workspace Folder clean.
+* If your project is complex and making up with many files, you may set configuration masmtasm.ASM.mode as workspace and keep your files' names follow the emulator's limitation.
+   * take include <filename> for example, the <filename> should be the relative path to your workspace Folder
+* Obviously, this extension may be not suitable for complex project
+Platform Support
+The extension depend on vscode-dosbox for intergration with DOS emulator. It has packaged all binary files for windows system.
+Follow its doc for installing emulator like DOSBox in other system.
+About DOSBox 's disk
+The extension will mount some folder to DOSBox 's disk.
+in DOSBoxreal path in the computerC:the path of tools folderD:the path of the work space
+Compile to .com files
+You can change the command to exec in setting masmtasm.ASM.actions. For example, if you want to compile your code to .com, you can add a setting like this. And set masmtasm.ASM.assembler to its key TASM-com
+
+"masmtasm.ASM.actions": {
+     "TASM-com": {
+      "baseBundle": "<built-in>/TASM.jsdos",
+      "before": [
+        "set PATH=C:\\TASM"
+      ],
+      "run": [
+        "TASM ${file}",
+        "TLINK /t ${filename}",
+        "${filename}"
+      ],
+      "debug": [
+        "TASM /zi ${file}",
+        "TLINK /t/v/3 ${filename}.obj",
+        "TD ${filename}.exe"
+      ]
+    }
+}
+"masmtasm.ASM.assembler":"TASM-com"
+
+Here are some of the codes I'm currently doing. I need you to analyze it and use the pattern to answer and code the activity i will be giving you after this message.
+
+;FILENAME: EXER29.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: This assembly language program will input 2 single digit numbers, add 2 numbers, and display the sum of the 2 numbers.
+
+;to start the program------------------------------------------------------------------------------
+.model small
+.stack 100h
+.data
+    num1 DB ?
+    num2 DB ?
+    sum DB ?
+
+    msg1 DB 'Enter first number (0-9): $'
+    msg2 DB 0dh, 0ah, 'Enter second number (0-9): $'
+    msg3 DB 0DH, 0AH, 'The sum is: $'
+.code
+main proc
+    ;initialize data segment
+    mov ax, @DATA; check later, if it does not work -> change to @data... Update: it works!
+    mov ds, ax
+
+    ;INPUTTING AND READING NUMBER------------------------------------------------------------------
+    ;Display msg1--1--
+    lea dx, msg1
+    mov ah, 09h
+    int 21h
+
+    ;Read character input--1--
+    mov ah, 01h
+    int 21h
+
+    sub al, '0'; Convert ASCII to number
+    mov num1, al
+
+    ;Display msg2--2--
+    lea dx, msg2
+    mov ah, 09h
+    int 21h
+
+    ;Read character input--2--
+    mov ah, 01h
+    int 21h
+
+    sub al, '0'; Convert ASCII to number
+    mov num2, al
+
+    ;Calculate sum
+    mov al, num1
+    add al, num2
+    mov sum, al
+
+    ;Display result--------------------------------------------------------------------------------
+    lea dx, msg3
+    mov ah, 09h
+    int 21h
+
+    ;Convert sum to ASCII
+    add sum, '0'
+    mov dl, sum
+    mov ah, 02h
+    int 21h
+
+    ;Exit program------------------------------------------------------------------------------------
+    mov ax, 4C00h
+    int 21h
+
+main endp
+end main
+
+;FILENAME: EXER31.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: Input 2 single digit numbers, multiply the two numbers and display the product of the two numbers.
+
+.model small
+.stack 100h
+.data
+    ;Initializing/defining string variables
+    msg1 db 0dh, 0ah, 'Enter first number(0-9): $'
+    msg2 db 0dh, 0ah, 'Enter second number(0-9): $'
+    resultMsg db 0dh, 0ah, 'The result is: $'
+
+    ;Declare single-byte variables for user inputs and result (uninitialized)
+    num1 db ?
+    num2 db ?
+    result db ?
+.code
+start:
+    ;Set up data segment
+    mov ax, @data
+    mov ds, ax
+
+    ;PROMPTING AND READING-------------------------------------------------------------------------
+    ;Prompt/Display for the inputting first number message--1--
+    mov ah, 09h ;-> can be interchanged with lea
+    lea dx, msg1
+    int 21h
+
+    ;Read first number--1--
+    call read_number
+    mov num1, al
+
+    ;Prompt/Display for the inputting second number message--2--
+    mov ah, 09h
+    lea dx, msg2
+    int 21h
+
+    ;Read second number--2--
+    call read_number
+    mov num2, al
+
+    ;MULTIPLYING 2 NUMBERS: NUM1 * NUM2------------------------------------------------------------
+    mov al, num1
+    mov bl, num2
+    mul bl; AL = AL * BL, result in AX
+    mov result, al
+
+    ;DISPLAYING THE RESULT-------------------------------------------------------------------------
+    ;Display the result
+    mov ah, 09h
+    lea dx, resultMsg
+    int 21h
+
+    ;Convert result to ASCII and print
+    call print_result
+    
+    ;EXIT PROGRAM----------------------------------------------------------------------------------
+    mov ax, 4C00h
+    int 21h
+
+;Read a number from keyboard (assumes single digit input, so pick from 0-9)------------------------
+read_number proc
+    mov ah, 01h; function to read a character
+    int 21h
+
+    sub al, '0'; Convert ASCII to integer
+    ret
+read_number endp
+
+;Print the result (single digit)
+print_result proc
+    add result, '0'; Convert result to ASCII
+    mov ah, 0eh; BIOS teletype output function
+    mov al, result
+    int 10h
+    ret
+print_result endp
+
+end start
+.model small
+.stack 100h
+.data
+    msg1 db 'Enter first number: $'
+    msg2 db 0dh, 0ah, 'Enter second number: $'
+    resultMsg db 0dh, 0ah, 'The result is: $'
+
+    num1 db ?
+    num2 db ?
+    result db ?
+
+.code
+start:
+    ;set up data segment
+    mov ax, @data
+    mov ds, ax
+
+    ;PROMPTING AND READING-------------------------------------------------------------------------
+    ;Prompt/Display for the inputting first number message--1--
+    mov ah, 09h ;-> can be interchanged with lea
+    lea dx, msg1
+    int 21h
+
+    ;Read first number--1--
+    call read_number
+    mov num1, al
+
+    ;Prompt/Display for the inputting second number message--2--
+    mov ah, 09h
+    lea dx, msg2
+    int 21h
+
+    ;Read second number--2--
+    call read_number
+    mov num2, al
+
+    ;SUBTRACTING 2 NUMBERS: NUM1 - NUM2------------------------------------------------------------
+    ;Subtract the second number from the first
+    mov al, num1
+    sub al, num2
+    mov result, al
+
+    ;DISPLAYING THE RESULT-------------------------------------------------------------------------
+    ;Display the result
+    mov ah, 09h
+    lea dx, resultMsg
+    int 21h
+
+    ;Convert result to ASCII and print
+    call print_result
+    
+    ;EXIT PROGRAM----------------------------------------------------------------------------------
+    mov ax, 4C00h
+    int 21h
+
+;Read a number from keyboard (assumes single digit input, so pick from 0-9)------------------------
+read_number proc
+    mov ah, 01h; function to read a character
+    int 21h
+
+    sub al, '0'; Convert ASCII to integer
+    ret
+read_number endp
+
+;Print the result (single digit)
+print_result proc
+    add result, '0'; Convert result to ASCII
+    mov ah, 0eh; BIOS teletype output function
+    mov al, result
+    int 10h
+    ret
+print_result endp
+
+end start
+
+
+
+;FILENAME: EXER32.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: This assembly language program will input 2 single digit numbers, divide the 2 numbers, and display the quotient of the 2 numbers.
+
+.model small
+.stack 100h
+.data
+    ;Initializing/defining string variables
+    msg1 db 0dh, 0ah, 'Enter first number(0-9): $'
+    msg2 db 0dh, 0ah, 'Enter second number(1-9): $';Second number cannot be zero
+    resultMsg db 0dh, 0ah, 'The result is: $'
+    divByZeroMsg db 0dh, 0ah, 'Cannot divide by 0$'
+
+    ;Declare single-byte variables for user inputs and result (uninitialized)
+    num1 db ?
+    num2 db ?
+    result db ?
+.code
+start:
+    ;Set up data segment
+    mov ax, @data
+    mov ds, ax
+
+    ;PROMPTING AND READING-------------------------------------------------------------------------
+    ;Prompt/Display for the inputting first number message--1--
+    mov ah, 09h ;-> can be interchanged with lea
+    lea dx, msg1
+    int 21h
+
+    ;Read first number--1--
+    call read_number
+    mov num1, al
+
+    ;Prompt/Display for the inputting second number message--2--
+    mov ah, 09h
+    lea dx, msg2
+    int 21h
+
+    ;Read second number--2--
+    call read_number
+    mov num2, al
+
+    ; Check for division by zero
+    cmp num2, 0
+    je div_by_zero
+
+    ;DIVIDE 2 NUMBERS: NUM1 / NUM2------------------------------------------------------------
+    ;Divide the second number from the first
+    mov al, num1
+    xor ah, ah; Clear ah for the division
+    mov bl, num2
+    div bl; AL = AL / BL, quotient in AL, remainder in AH
+    mov result, al; Store the quotient
+
+    ;DISPLAYING THE RESULT-------------------------------------------------------------------------
+    ;Display the result
+    mov ah, 09h
+    lea dx, resultMsg
+    int 21h
+
+    ;Convert result to ASCII and print
+    call print_result
+    
+    ;EXIT PROGRAM----------------------------------------------------------------------------------
+    mov ax, 4C00h
+    int 21h
+
+;Handling division by 0----------------------------------------------------------------------------
+div_by_zero:
+    ;Handle division by zero (optional: you can display a message)
+    mov ah, 09h
+    lea dx, divByZeroMsg
+    int 21h
+
+    ;Exit program
+    mov ax, 4C00h
+    int 21h
+
+;Read a number from keyboard (assumes single digit input, so pick from 0-9)------------------------
+read_number proc
+    mov ah, 01h; function to read a character
+    int 21h
+
+    sub al, '0'; Convert ASCII to integer
+    ret
+read_number endp
+
+;Print the result (single digit)
+print_result proc
+    add result, '0'; Convert result to ASCII
+    mov ah, 0eh; BIOS teletype output function
+    mov al, result
+    int 10h
+    ret
+print_result endp
+
+end start
+And here are some notes, read the notes:
+
+NOTES:
+Source: Introduction to Assembly Language Programming From 8086 to Pentium Processors by Sivarama P. Dandamudi.
+---
+
+The **cmp (CoMPare)** instruction is used to compare two operands (equal, not equal, and so on). 
+The **cmp** instruction performs the same operation as the **sub** except that the result of subtraction is not saved. 
+Thus, **cmp** does not disturb both destination and source operands. 
+While both **sub** and **cmp** instructions take the same number of clocks in most cases, **cmp** requires one less if the destination is memory. 
+This is because the **cmp** instruction does not write the result in memory, whereas the **sub** instruction does.
+
+The **cmp** instruction is used in conjunction with conditional jump instructions for decision making. 
+This is the topic of the next section.
+
+---
+
+### **3.5.2 Conditional Execution**
+
+The Pentium instruction set contains several branching and looping instructions to construct programs that require conditional execution. 
+In this section, we will discuss a subset of these instructions. 
+A detailed discussion can be found in Chapter 7.
+
+Program execution, by default, proceeds in a sequential manner—execution of instructions is in the order present in the program. 
+However, programs often require conditional and looping constructs.
+
+---
+
+### **Unconditional Jump**
+
+The unconditional jump instruction **jmp**, as its name implies, 
+tells the processor that the next instruction to be executed is located at the label that is given as a part of the instruction. 
+This jump instruction has the form
+
+```
+jmp label
+```
+
+where **label** identifies the next instruction to be executed. The following example
+
+```
+mov EAX,1
+inc_again:
+inc EAX
+jmp inc_again
+mov EBX,EAX
+```
+
+results in an infinite loop incrementing **EAX** repeatedly. 
+
+The instruction:
+```
+mov EBX,EAX
+```
+and all the instructions following it are never executed!
+
+From this example, the **jmp** instruction appears to be useless. 
+Later, we will show some examples that illustrate the use of this instruction.
+
+---
+
+### **Conditional Jump**
+
+In conditional jump instructions, program execution is transferred to the target instruction only when the specified condition is satisfied. 
+The general format is:
+```
+j<cond> label
+```
+where `<cond>` identifies the condition under which the target instruction at **label** should be executed. 
+Usually, the condition being tested is the result of the last arithmetic/logic operation. 
+
+For example, the following code:
+```
+read_char:
+    mov DL,0
+    .
+    (code for reading a character into AL)
+    .
+    cmp AL,0DH        ; compare the character to CR
+    je  CR_received   ; if equal, jump to CR_received
+    inc CL            ; otherwise, increment CL and
+    jmp read_char     ; go back to read another
+                      ; character from keyboard
+
+CR_received:
+    mov DL,AL
+    .
+```
+
+reads characters from the keyboard until the carriage return (CR) key is pressed.
+The character count is maintained in the **CL** register. 
+
+The two instructions:
+```
+cmp AL,0DH     ; 0DH is ASCII for carriage return
+je  CR_received ; je stands for jump on equal
+```
+perform the required conditional execution. 
+How does the processor remember the result of the previous **cmp** operation when it is executing the **je** instruction? 
+One of the purposes of the **flags register** is to provide such short-term memory between instructions. 
+Let us look at the actions taken by the processor in executing these two instructions.
+
+Remember that the **cmp** instruction subtracts 0DH from the contents of the **AL** register. 
+While the result is not saved anywhere, the operation sets the zero flag (**ZF = 1**) if the two operands are the same. 
+If not, **ZF = 0**. The **ZF** retains this value until another instruction that affects **ZF** is executed. 
+Note that not all instructions affect all the flags. 
+In particular, the **mov** instruction does not affect any of the flags.
+
+Thus, at the time of the **je** instruction execution, 
+the processor checks the **ZF** and program execution jumps to the labeled instruction if and only if **ZF = 1**.
+
+---
+
+To cause the jump, Pentium loads the (E)IP register with the target instruction address. 
+Recall that the (E)IP register always points to the next instruction to be executed. 
+
+Therefore, when the character read is CR, instead of fetching the instruction:
+```
+inc CL
+```
+
+it will fetch the:
+```
+mov DL,AL
+```
+instruction. Here are some of the conditions tested by conditional jump instructions:
+
+| Mnemonic | Meaning                    |
+| -------- | -------------------------- |
+| je       | jump if equal              |
+| jg       | jump if greater            |
+| jl       | jump if less               |
+| jge      | jump if greater or equal   |
+| jle      | jump if less than or equal |
+| jne      | jump if not equal          |
+
+Conditional jumps can also test the values of flags. Some examples are:
+
+| Mnemonic | Meaning                             |
+| -------- | ----------------------------------- |
+| jz       | jump if zero (i.e., if ZF = 1)      |
+| jnz      | jump if not zero (i.e., if ZF = 0)  |
+| jc       | jump if carry (i.e., if CF = 1)     |
+| jnc      | jump if not carry (i.e., if CF = 0) |
+
+---
+
+**Example:**
+Consider the following code. The following table shows the actions taken depending on *statement_1*.
+
+```
+go_back:
+    inc AL
+    .
+    .
+    cmp AL,BL
+statement_1
+    mov BL,77H
+```
+
+---
+
+| **statement_1** | **AL** | **BL** | **Action taken**                                      |
+| --------------- | ------ | ------ | ----------------------------------------------------- |
+| je go_back      | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jg go_back      | 56H    | 55H    | Program control transferred to **inc AL**             |
+| jg go_back      | 56H    | 56H    | No jump; executes the next instruction **mov BL,77H** |
+| jl go_back      | 56H    | 56H    | No jump; executes the next instruction **mov BL,77H** |
+| jle go_back     | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jge go_back     | 56H    | 56H    | Program control transferred to **inc AL**             |
+| jne go_back     | 27H    | 26H    | Program control transferred to **inc AL**             |
+| jg go_back      |        |        |                                                       |
+| jge go_back     |        |        |                                                       |
+
+---
+The conditional jump instructions assume that the operands compared were treated as signed numbers. 
+There is another set of conditional jump instructions for operands that are unsigned numbers. 
+But until these instructions are discussed in Chapter 7, 
+the six conditional jump instructions introduced here are sufficient for writing simple assembly language programs.
+---
+
+## What I Need Help With
+Create a calculator program to perform the actual math 
+operations and display the results. You may use any 
+background color. See sample runs below.
+After the user chooses an item from the main menu and 
+inputs the numbers, the program performs the operation and 
+displays the result, the program does the following:
+1) Clear the screen (look for the code on how to clear the 
+screen.
+2) Displays the main menu and waits for the user to choose 
+an operation.
+3) The program will end when the user chooses Exit.
+
+This is how the running program will look like at the initial state (without inputs yet). Do take into consideration the spaces and new lines. P.S ignore the ; it's a comment to let you know which string to color
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: 
+
+This is how the running program will look like If we input 'a' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: a
+
+Addition    ;color the background of the string and end the color at the length of the string of characters.
+Enter first addened: 1
+Enter second addened: 2
+First addened is: 1
+Second addened is: 2
+Sum: 3
+
+Press Enter to continue
+
+This is how the running program will look like If we input 's' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: s
+
+Subtraction ;color the background of the string and end the color at the length of the string of characters.
+Enter minuend: 2
+Enter subtrahend: 1
+Minuend is: 2
+Subtrahend is: 1
+Difference: 1
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'm' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: m
+
+Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+Enter multiplicand: 1
+Enter multiplier: 2
+Multiplicand is: 1
+Multiplier is: 2
+Product: 2
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'd' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: d
+
+Division    ;color the background of the string and end the color at the length of the string of characters.
+Enter dividend: 4
+Enter divisor: 2
+Dividend is: 4
+Divisor is: 2
+Quotient: 2
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'e' to exit. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: e
+
+Exit Program    ;color the background of the string and end the color at the length of the string of characters.
+
+Press Enter to continue.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Version 2:
+# Assembly Language Programming Context
+
+## My Development Environment
+I'm coding assembly language in VSCode using the extension **MASM/TASM by clcxsrolau**.
+
+**Key Extension Features:**
+- Basic language support for MASM/TASM in DOS environment
+- Right-click to run and debug code in DOSBox
+- Disk mounting: C: (tools folder), D: (workspace)
+- Configuration: `masmtasm.ASM.mode` can be "single file" or "workspace"
+- Uses DOS interrupts (INT 21h, INT 10h) for I/O operations
+
+## Assembly Language Concepts I'm Learning
+
+### CMP Instruction
+- **cmp** (CoMPare) compares two operands without saving the result
+- Performs subtraction like **sub** but doesn't store the result
+- Sets flags (especially ZF - Zero Flag) based on comparison
+- Used with conditional jump instructions for decision making
+
+### Conditional Jump Instructions
+**Comparison-based jumps:**
+- `je` - jump if equal
+- `jg` - jump if greater
+- `jl` - jump if less
+- `jge` - jump if greater or equal
+- `jle` - jump if less than or equal
+- `jne` - jump if not equal
+
+**Flag-based jumps:**
+- `jz` - jump if zero (ZF = 1)
+- `jnz` - jump if not zero (ZF = 0)
+- `jc` - jump if carry (CF = 1)
+- `jnc` - jump if not carry (CF = 0)
+
+### How Conditional Jumps Work
+1. `cmp` instruction subtracts operands and sets flags
+2. Flags register provides short-term memory between instructions
+3. Conditional jump checks the flag state
+4. If condition is true, (E)IP register is loaded with target address
+5. Program execution continues at the labeled instruction
+
+## My Coding Pattern and Style
+
+### Standard Program Structure
+```assembly
+;FILENAME: EXERXX.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: [DATE]
+;DESCRIPTION: [Brief description of program]
+
+.model small
+.stack 100h
+.data
+    ; Variables and messages here
+.code
+start:
+    ; Program code here
+    
+    ; Exit program
+    mov ax, 4C00h
+    int 21h
+
+; Procedures here
+
+end start
+```
+
+### Common Patterns I Use
+
+**1. Message Display:**
+```assembly
+mov ah, 09h
+lea dx, msg1
+int 21h
+```
+
+**2. Single Character Input:**
+```assembly
+mov ah, 01h
+int 21h
+sub al, '0'  ; Convert ASCII to integer
+```
+
+**3. Single Character Output:**
+```assembly
+add result, '0'  ; Convert to ASCII
+mov ah, 0eh
+mov al, result
+int 10h
+```
+
+**4. Reusable Read Procedure:**
+```assembly
+read_number proc
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    ret
+read_number endp
+```
+
+**5. Reusable Print Procedure:**
+```assembly
+print_result proc
+    add result, '0'
+    mov ah, 0eh
+    mov al, result
+    int 10h
+    ret
+print_result endp
+```
+
+**6. Error Handling with Conditional Jumps:**
+```assembly
+cmp num2, 0
+je div_by_zero
+
+; Normal code here
+
+div_by_zero:
+    mov ah, 09h
+    lea dx, errorMsg
+    int 21h
+    mov ax, 4C00h
+    int 21h
+```
+
+## Example Programs I've Written
+
+### EXER29.ASM - Addition
+- Inputs two single-digit numbers (0-9)
+- Adds them together
+- Displays the sum
+
+### EXER31.ASM - Multiplication
+- Inputs two single-digit numbers (0-9)
+- Multiplies them using `mul` instruction
+- Displays the product
+
+### Subtraction Program (Unnamed)
+- Inputs two single-digit numbers
+- Subtracts second from first using `sub` instruction
+- Displays the result
+
+### EXER32.ASM - Division with Error Handling
+- Inputs two single-digit numbers
+- Checks for division by zero using `cmp` and `je`
+- Divides first by second using `div` instruction
+- Displays quotient or error message
+
+## Key Programming Notes
+- Working with single-digit numbers (0-9) only
+- ASCII conversion: subtract '0' for input, add '0' for output
+- Use `xor ah, ah` to clear AH before division
+- Clear commenting with section markers
+- Consistent variable naming: num1, num2, result
+- Message variables end with 'Msg'
+- Line breaks: `0dh, 0ah` for new line
+- String terminator: `$` for DOS string display
+
+## What I Need Help With
+Create a calculator program to perform the actual math 
+operations and display the results. You may use any 
+background color. See sample runs below.
+After the user chooses an item from the main menu and 
+inputs the numbers, the program performs the operation and 
+displays the result, the program does the following:
+1) Clear the screen (look for the code on how to clear the 
+screen.
+2) Displays the main menu and waits for the user to choose 
+an operation.
+3) The program will end when the user chooses Exit.
+
+This is how the running program will look like at the initial state (without inputs yet). Do take into consideration the spaces and new lines. P.S ignore the ; it's a comment to let you know which string to color
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: 
+
+This is how the running program will look like If we input 'a' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: a
+
+Addition    ;color the background of the string and end the color at the length of the string of characters.
+Enter first addened: 1
+Enter second addened: 2
+First addened is: 1
+Second addened is: 2
+Sum: 3
+
+Press Enter to continue
+
+This is how the running program will look like If we input 's' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: s
+
+Subtraction ;color the background of the string and end the color at the length of the string of characters.
+Enter minuend: 2
+Enter subtrahend: 1
+Minuend is: 2
+Subtrahend is: 1
+Difference: 1
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'm' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: m
+
+Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+Enter multiplicand: 1
+Enter multiplier: 2
+Multiplicand is: 1
+Multiplier is: 2
+Product: 2
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'd' and input single digit numbers. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: d
+
+Division    ;color the background of the string and end the color at the length of the string of characters.
+Enter dividend: 4
+Enter divisor: 2
+Dividend is: 4
+Divisor is: 2
+Quotient: 2
+
+Press Enter to continue.
+
+This is how the running program will look like If we input 'e' to exit. Do take into consideration the spaces and new lines
+THE CALCULATOR
+Created by: KESHA JANE L. CENIZA    
+Date: October 8, 2025
+
+Main menu
+a - Addition    ;color the background of the string and end the color at the length of the string of characters.
+s - Subtraction ;color the background of the string and end the color at the length of the string of characters.
+m - Multiplication  ;color the background of the string and end the color at the length of the string of characters.
+d - Division    ;color the background of the string and end the color at the length of the string of characters.
+e - Exit    ;color the background of the string and end the color at the length of the string of characters.
+Enter your choice: e
+
+Exit Program    ;color the background of the string and end the color at the length of the string of characters.
+
+Press Enter to continue.

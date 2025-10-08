@@ -1,0 +1,9 @@
+Perform the next set of Assembly Language programming exercises.
+Open the attached PDF to read the instructions.
+Compile all your source codes in a text file.
+Save your text file in your OneDrive or Google Drive folder.
+You may use any filename for your text file.
+Get the URL link of your text file.
+Attach the URL link in Teams.
+Don't forget to TURN IN.
+Deadline: 11:59 PM Thursday, October 9, 2025.

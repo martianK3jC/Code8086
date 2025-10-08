@@ -1,3 +1,8 @@
+;FILENAME: EXER30.ASM
+;PROGRAMMER NAME: KESHA JANE L. CENIZA
+;DATE: OCTOBER 8, 2025
+;DESCRIPTION: This assembly language program will input 2 single digit numbers, minus 2 numbers, and display the difference of the 2 numbers.
+
 .model small
 .stack 100h
 .data
@@ -66,7 +71,6 @@ read_number endp
 print_result proc
     add result, '0'; Convert result to ASCII
     mov ah, 0eh; BIOS teletype output function
-
     mov al, result
     int 10h
     ret
