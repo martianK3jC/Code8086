@@ -3,7 +3,8 @@
 ;DATE: OCTOBER 8, 2025
 ;DESCRIPTION: This assembly language program will get 3 string inputs and display back the 3 strings on separate lines
 ;DOS -> Disk Operating System
-;to start the program
+
+;to start the program------------------------------------------------------------------------------
 .MODEL SMALL
 .STACK 100h
 .DATA
@@ -32,7 +33,7 @@ MAIN PROC
 
     ;Read input first string---1---
     lea dx, inputString1
-    mov ah, 0Ah; DOS function to read a string
+    ; mov ah, 0Ah; DOS function to read a string
     int 21h
 
     ;display new line---1---
