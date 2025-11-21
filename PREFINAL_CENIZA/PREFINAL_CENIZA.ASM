@@ -3,7 +3,6 @@
 ; PROGRAMMER NAME: KESHA JANE L. CENIZA
 ; DATE: NOVEMBER 21, 2025
 ; DESCRIPTION: CIT-U Air Condition Unit Control System
-;              Cyan background with yellow text
 ;=====================================================================
 
 .MODEL SMALL
