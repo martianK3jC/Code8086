@@ -1,6 +1,7 @@
 ;==========================================================
 ; FILENAME: STACK.ASM
-; COMPATIBILITY: TASM / MASM
+; PROGRAMMER: KESHA JANE L. CENIZA
+; DATE: OCTOBER 28, 2025
 ; DESCRIPTION: Stack Machine Architecture
 ;              Conditional operation using stack
 ;==========================================================
