@@ -5,6 +5,16 @@
 ; MACROS
 ; =============================================================
 
+; =============================================================
+; Name of System: Online Food Ordering System
+; Description: This program controls an online food ordering system.
+;              It allows users to register, login, and manage orders
+;              (Create, View, Update, Delete). Records are stored
+;              in memory during runtime.
+; Programmer: Kesha Jane L. Ceniza
+; Date: December 14, 2025
+; =============================================================
+
 ; Macro to print a string
 PRINT MACRO msg
     LEA DX, msg
@@ -21,6 +31,55 @@ NEWLINE MACRO
     INT 21H
 ENDM
 
+; Macro to print colored text - character by character approach
+PRINT_COLORED MACRO msg, color
+    LOCAL print_loop, print_done, is_control_char, print_char
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+    
+    LEA SI, msg
+    
+print_loop:
+    MOV AL, [SI]
+    CMP AL, '$'
+    JE print_done
+    
+    ; Check if it's a control character (newline, carriage return, etc.)
+    CMP AL, 13
+    JE is_control_char
+    CMP AL, 10
+    JE is_control_char
+    
+    ; It's a printable character - apply color
+    MOV AH, 09H
+    MOV BL, color
+    MOV CX, 1
+    INT 10H
+    
+print_char:
+    ; Output the character
+    MOV AH, 02H
+    MOV DL, AL
+    INT 21H
+    
+    INC SI
+    JMP print_loop
+    
+is_control_char:
+    ; Don't apply color to control characters, just print them
+    JMP print_char
+    
+print_done:
+    POP SI
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+ENDM
+
 ; Macro to get string input
 GET_STRING MACRO buffer
     LEA DX, buffer
@@ -28,10 +87,10 @@ GET_STRING MACRO buffer
     INT 21H
 ENDM
 
-; Macro to clear screen and set blue background
+; Macro to clear screen and set black background
 CLEAR_SCREEN MACRO
     MOV AX, 0600H   ; Scroll up function
-    MOV BH, 17H     ; Attribute: Blue Background (1), White Text (7)
+    MOV BH, 07H     ; Attribute: Black Background (0), White Text (7)
     MOV CX, 0000H   ; Upper left corner (0,0)
     MOV DX, 184FH   ; Lower right corner (24,79)
     INT 10H
@@ -47,72 +106,109 @@ ENDM
     ; =========================================================
     ; SYSTEM MESSAGES
     ; =========================================================
-    app_title       DB '==========================================', 13, 10
-                    DB '      ONLINE FOOD ORDERING SYSTEM         ', 13, 10
-                    DB '==========================================', 13, 10, '$'
+    app_title       DB 13, 10, 13, 10, 13, 10
+                    DB '     ************************************************', 13, 10
+                    DB '     *                                              *', 13, 10
+                    DB '     *          ONLINE FOOD ORDERING SYSTEM         *', 13, 10
+                    DB '     *                                              *', 13, 10
+                    DB '     *           Welcome to FOODIE EXPRESS!         *', 13, 10
+                    DB '     *                                              *', 13, 10
+                    DB '     ************************************************', 13, 10, '$'
     
-    programmer      DB 'Programmer: Kesha Jane L. Ceniza', 13, 10, '$'
+    programmer      DB 13, 10
+                    DB '       Developed by: Kesha Jane L. Ceniza', 13, 10, '$'
+    program_date    DB '       Date: December 14, 2025', 13, 10, 13, 10, '$'
     
     ; Menu Messages
-    menu_login_title DB '--- LOGIN MENU ---', 13, 10, '$'
-    menu_opt1        DB '1. Login', 13, 10, '$'
-    menu_opt2        DB '2. Register', 13, 10, '$'
-    menu_opt3        DB '3. Exit', 13, 10, '$'
+    menu_login_title DB 13, 10, '  ========================================', 13, 10
+                             DB '                 LOGIN MENU               ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    menu_opt1        DB 13, 10, '  [1] Login', 13, 10, '$'
+    menu_opt2                DB '  [2] Register', 13, 10, '$'
+    menu_opt3                DB '  [3] Exit', 13, 10, 13, 10, '$'
     
-    menu_main_title  DB '--- MAIN MENU ---', 13, 10, '$'
-    menu_main_1      DB '1. Create New Order', 13, 10, '$'
-    menu_main_2      DB '2. View All Orders', 13, 10, '$'
-    menu_main_3      DB '3. Update Order', 13, 10, '$'
-    menu_main_4      DB '4. Delete Order', 13, 10, '$'
-    menu_main_5      DB '5. Logout', 13, 10, '$'
-    menu_main_6      DB '6. Exit Program', 13, 10, '$'
+    menu_main_title  DB 13, 10, '  ========================================', 13, 10
+                             DB '                  MAIN MENU               ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    menu_main_1      DB 13, 10, '  [1] Create New Order', 13, 10, '$'
+    menu_main_2              DB '  [2] View All Orders', 13, 10, '$'
+    menu_main_3              DB '  [3] Update Order', 13, 10, '$'
+    menu_main_4              DB '  [4] Delete Order', 13, 10, '$'
+    menu_main_5              DB '  [5] Logout', 13, 10, '$'
+    menu_main_6              DB '  [6] Exit Program', 13, 10, 13, 10, '$'
     
-    prompt_choice    DB 'Enter your choice: $'
+    prompt_choice    DB '  Enter your choice: $'
     
     ; Auth Prompts
-    msg_reg_title    DB '--- REGISTRATION ---', 13, 10, '$'
-    msg_login_title  DB '--- LOGIN ---', 13, 10, '$'
-    msg_user         DB 'Username: $'
-    msg_pass         DB 'Password: $'
-    msg_name         DB 'Full Name: $'
-    msg_success_reg  DB 'Registration Successful!', 13, 10, '$'
-    msg_success_log  DB 'Login Successful! Welcome.', 13, 10, '$'
-    msg_fail_log     DB 'Invalid Username or Password.', 13, 10, '$'
+    msg_reg_title    DB 13, 10, '  ========================================', 13, 10
+                             DB '                REGISTRATION              ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_login_title  DB 13, 10, '  ========================================', 13, 10
+                             DB '                   LOGIN                  ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_user         DB 13, 10, '  Username: $'
+    msg_pass                 DB '  Password: $'
+    msg_pass_conf            DB '  Confirm Password: $'
+    msg_name                 DB '  Full Name: $'
+    msg_err_pass     DB 13, 10, '  Error: Passwords do not match!', 13, 10, '$'
+    msg_success_reg  DB 13, 10, '  Registration Successful!', 13, 10, '$'
+    msg_success_log  DB 13, 10, '  Login Successful! Welcome.', 13, 10, '$'
+    msg_fail_log     DB 13, 10, '  Invalid Username or Password.', 13, 10, '$'
     
     ; Create Order Prompts
-    msg_create_title DB '--- CREATE NEW ORDER ---', 13, 10, '$'
-    msg_food         DB 'Food Name: $'
-    msg_qty          DB 'Quantity: $'
-    msg_price        DB 'Price: $'
-    msg_addr         DB 'Address: $'
-    msg_order_succ   DB 'Order Created Successfully!', 13, 10, '$'
+    msg_create_title DB 13, 10, '  ========================================', 13, 10
+                             DB '              CREATE NEW ORDER            ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_food         DB 13, 10, '  Food Name: $'
+    msg_qty                  DB '  Quantity: $'
+    msg_price                DB '  Price: $'
+    msg_addr                 DB '  Address: $'
+    msg_contact              DB '  Contact No.: $'
+    msg_order_succ   DB 13, 10, '  Order Created Successfully!', 13, 10, '$'
     
     ; View Order Prompts
-    msg_view_title   DB '--- VIEW ALL ORDERS ---', 13, 10, '$'
-    msg_no_orders    DB 'No orders found.', 13, 10, '$'
+    msg_view_title   DB 13, 10, '  ========================================', 13, 10
+                             DB '               VIEW ALL ORDERS            ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_no_orders    DB 13, 10, '  No orders found.', 13, 10, '$'
 
     ; Delete Order Prompts
-    msg_del_title    DB '--- DELETE ORDER ---', 13, 10, '$'
-    msg_del_id       DB 'Enter Order ID to Delete: $'
-    msg_del_succ     DB 'Order Deleted Successfully!', 13, 10, '$'
-    msg_del_err      DB 'Order ID not found!', 13, 10, '$'
+    msg_del_title    DB 13, 10, '  ========================================', 13, 10
+                             DB '                DELETE ORDER              ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_del_id       DB 13, 10, '  Enter Order ID to Delete (0 to go back): $'
+    msg_del_succ     DB 13, 10, '  Order Deleted Successfully!', 13, 10, '$'
+    msg_del_err      DB 13, 10, '  Order ID not found!', 13, 10, '$'
+    
+    ; Update Order Prompts
+    msg_upd_title    DB 13, 10, '  ========================================', 13, 10
+                             DB '                UPDATE ORDER               ', 13, 10
+                             DB '  ========================================', 13, 10, '$'
+    msg_upd_id       DB 13, 10, '  Enter Order ID to Update (0 to go back): $'
+    msg_upd_succ     DB 13, 10, '  Order Updated Successfully!', 13, 10, '$'
     
     ; Table Headers (Basic spacing)
-    ; ID(3) Food(15) Qty(5) Price(8) Total(8)
-    table_header     DB 'ID   Food Name       Qty   Price   Total', 13, 10
-                     DB '----------------------------------------', 13, 10, '$'
+    ; ID(3) Food(15) Qty(5) Price(8) Total(8) Address(15) Contact(12)
+    table_header     DB 'ID   Food Name       Qty   Price   Total   Address         Contact', 13, 10
+                     DB '----------------------------------------------------------------------', 13, 10, '$'
     
     spacer           DB '   $' ; Space between columns
     
-    msg_wait         DB 13, 10, 'Press any key to continue...', '$'
+    msg_wait         DB 13, 10, '  Press any key to continue...', '$'
+    msg_wait_login   DB 13, 10, '  Press any key to return to Login Menu...', '$'
+    msg_wait_main    DB 13, 10, '  Press any key to return to Main Menu...', '$'
+    msg_opening_footer DB '================================================', 13, 10, '$'
     msg_error        DB 'Invalid Input! Press any key...', '$'
     msg_full         DB 'Order limit reached (10)!', 13, 10, '$'
+    msg_exit         DB 13, 10, 13, 10, '  Thank you for using the Online Food Ordering System!', 13, 10
+                     DB '  Have a great day!', 13, 10, 13, 10, '$'
 
     ; =========================================================
     ; USER DATA
     ; =========================================================
     reg_username    DB 21, ?, 21 DUP('$') 
     reg_password    DB 21, ?, 21 DUP('$')
+    reg_pass_confirm DB 21, ?, 21 DUP('$')
     reg_fullname    DB 31, ?, 31 DUP('$')
     
     login_user_buff DB 21, ?, 21 DUP('$') 
@@ -141,6 +237,9 @@ ENDM
     
     ; 5. Addresses (10 items * 50 chars = 500 bytes)
     order_addresses DB 500 DUP('$')
+    
+    ; 6. Contacts (10 items * 15 chars = 150 bytes)
+    order_contacts  DB 150 DUP('$')
 
 .CODE
 MAIN PROC
@@ -203,7 +302,7 @@ GO_VIEW:
     CALL VIEW_ORDERS_PROC
     JMP MAIN_MENU_LOOP
 GO_UPDATE:
-    ; CALL UPDATE_ORDER_PROC
+    CALL UPDATE_ORDER_PROC
     JMP MAIN_MENU_LOOP
 GO_DELETE:
     CALL DELETE_ORDER_PROC
@@ -212,6 +311,12 @@ DO_LOGOUT:
     JMP LOGIN_LOOP
 
 EXIT_PROG:
+    CLEAR_SCREEN
+    NEWLINE
+    NEWLINE
+    PRINT msg_exit
+    MOV AH, 07H
+    INT 21H
     MOV AH, 4CH
     INT 21H
 MAIN ENDP
@@ -222,15 +327,26 @@ MAIN ENDP
 
 SHOW_OPENING PROC
     CLEAR_SCREEN
-    MOV AH, 02H
-    MOV BH, 00H
-    MOV DX, 0510H 
-    INT 10H
-    PRINT app_title
-    NEWLINE
-    PRINT programmer
     
-    ; Added instruction to tell user to press a key
+    ; Print title centered
+    PRINT app_title
+    
+    ; Print programmer info
+    PRINT programmer
+    PRINT program_date
+    
+    ; Print decorative line
+    MOV AH, 02H
+    MOV DL, ' '
+    MOV CX, 5
+PRINT_SPACES:
+    INT 21H
+    LOOP PRINT_SPACES
+    
+    LEA DX, msg_opening_footer
+    MOV AH, 09H
+    INT 21H
+    
     PRINT msg_wait
     
     MOV AH, 07H
@@ -269,17 +385,43 @@ REGISTER_PROC PROC
     CLEAR_SCREEN
     PRINT msg_reg_title
     NEWLINE
+    
+    ; Get Username
     PRINT msg_user
     GET_STRING reg_username
     NEWLINE
+    
+    ; Get Password
     PRINT msg_pass
     GET_STRING reg_password
     NEWLINE
+    
+    ; Get Confirm Password
+    PRINT msg_pass_conf
+    GET_STRING reg_pass_confirm
+    NEWLINE
+    
+    ; Verify Passwords
+    LEA SI, reg_password
+    LEA DI, reg_pass_confirm
+    CALL STR_COMPARE
+    CMP BX, 1
+    JE PASS_OK
+    
+    PRINT_COLORED msg_err_pass, 0Ch     ; Red
+    PRINT msg_wait
+    MOV AH, 07H
+    INT 21H
+    RET
+    
+PASS_OK:
+    ; Get Full Name
     PRINT msg_name
     GET_STRING reg_fullname
     NEWLINE
-    PRINT msg_success_reg
-    PRINT msg_wait
+    
+    PRINT_COLORED msg_success_reg, 0Ah  ; Green
+    PRINT msg_wait_login
     MOV AH, 07H
     INT 21H
     RET
@@ -309,7 +451,7 @@ LOGIN_PROC PROC
     JE LOGIN_FAIL
     
     ; Success
-    PRINT msg_success_log
+    PRINT_COLORED msg_success_log, 0Ah  ; Green
     PRINT msg_wait
     MOV AH, 07H
     INT 21H
@@ -317,8 +459,8 @@ LOGIN_PROC PROC
     RET
 
 LOGIN_FAIL:
-    PRINT msg_fail_log
-    PRINT msg_wait
+    PRINT_COLORED msg_fail_log, 0Ch      ; Red
+    PRINT msg_wait_login
     MOV AH, 07H
     INT 21H
     MOV BX, 0 ; Fail Flag
@@ -393,16 +535,29 @@ PROCEED_CREATE:
     LEA SI, input_temp
     CALL COPY_TO_STORAGE
     
-    ; 6. Increment Count
+    ; 6. Get Contact
+    PRINT msg_contact
+    GET_STRING input_temp
+    NEWLINE
+    ; Store Contact: order_count * 15
+    MOV AL, order_count
+    MOV BL, 15
+    MUL BL
+    LEA DI, order_contacts
+    ADD DI, AX
+    LEA SI, input_temp
+    CALL COPY_TO_STORAGE
+
+    ; 7. Increment Count
     INC order_count
-    PRINT msg_order_succ
+    PRINT_COLORED msg_order_succ, 0Ah   ; Green
     JMP CREATE_DONE
 
 LIMIT_REACHED:
-    PRINT msg_full
+    PRINT_COLORED msg_full, 0Ch          ; Red
 
 CREATE_DONE:
-    PRINT msg_wait
+    PRINT msg_wait_main
     MOV AH, 07H
     INT 21H
     RET
@@ -415,7 +570,9 @@ VIEW_ORDERS_PROC PROC
     
     ; Check if empty
     CMP order_count, 0
-    JE NO_DATA
+    JNE VIEW_START
+    JMP NO_DATA
+VIEW_START:
     
     PRINT table_header
     
@@ -478,12 +635,44 @@ VIEW_LOOP:
     ; Price is in DX currently. Qty in AX.
     MUL DX          ; AX = AX * DX -> Total = Qty * Price
     CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; 6. Print Address
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 50
+    MUL DX
+    LEA DX, order_addresses
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    PRINT spacer
+
+    ; 7. Print Contact
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 15
+    MUL DX
+    LEA DX, order_contacts
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
     
     NEWLINE
     
     INC BX
     POP CX          ; Restore outer loop count
-    LOOP VIEW_LOOP
+    
+    ; Long Jump Logic for Loop
+    DEC CX
+    CMP CX, 0
+    JNE VIEW_CONTINUE
+    JMP SHORT VIEW_LOOP_DONE
+VIEW_CONTINUE:
+    JMP VIEW_LOOP
+VIEW_LOOP_DONE:
     
     JMP VIEW_EXIT
 
@@ -491,11 +680,251 @@ NO_DATA:
     PRINT msg_no_orders
 
 VIEW_EXIT:
-    PRINT msg_wait
+    PRINT msg_wait_main
     MOV AH, 07H
     INT 21H
     RET
 VIEW_ORDERS_PROC ENDP
+
+UPDATE_ORDER_PROC PROC
+    CLEAR_SCREEN
+    PRINT msg_upd_title
+    NEWLINE
+    
+    ; Check if empty
+    CMP order_count, 0
+    JNE UPD_SHOW_ORDERS
+    JMP UPD_NO_DATA
+
+UPD_SHOW_ORDERS:
+    ; Display all orders first
+    PRINT table_header
+    
+    MOV CL, order_count
+    MOV CH, 0
+    MOV BX, 0
+    
+UPD_DISPLAY_LOOP:
+    PUSH CX
+    
+    ; Print ID
+    MOV AX, BX
+    INC AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Food
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 30
+    MUL DX
+    LEA DX, order_foods
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    PRINT spacer
+    
+    ; Print Qty
+    LEA SI, order_qtys
+    ADD SI, BX
+    MOV AL, [SI]
+    MOV AH, 0
+    PUSH AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Price
+    PUSH BX
+    MOV AX, BX
+    SHL AX, 1
+    LEA SI, order_prices
+    ADD SI, AX
+    MOV AX, [SI]
+    MOV DX, AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    POP BX
+    
+    ; Print Total
+    POP AX
+    MUL DX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Address
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 50
+    MUL DX
+    LEA DX, order_addresses
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    PRINT spacer
+    
+    ; Print Contact
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 15
+    MUL DX
+    LEA DX, order_contacts
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    
+    NEWLINE
+    INC BX
+    POP CX
+    DEC CX
+    CMP CX, 0
+    JE UPD_DISPLAY_DONE
+    JMP UPD_DISPLAY_LOOP
+UPD_DISPLAY_DONE:
+    
+UPD_START_CHECK:
+    NEWLINE
+
+    ; Get ID
+    PRINT msg_upd_id
+    GET_STRING input_temp
+    NEWLINE
+    
+    LEA SI, input_temp
+    CALL STR_TO_NUM ; AX = ID
+    
+    ; Check if user wants to go back (ID = 0)
+    CMP AX, 0
+    JNE UPD_CONTINUE
+    JMP UPD_EXIT
+UPD_CONTINUE:
+    
+    ; Validate ID
+    CMP AX, 0
+    JG UPD_CHECK_UPPER
+    JMP UPD_INVALID
+
+UPD_CHECK_UPPER:
+    MOV BL, order_count
+    MOV BH, 0
+    CMP AX, BX
+    JLE UPD_START
+    JMP UPD_INVALID
+
+UPD_START:
+    ; ID is valid. Index in BX = ID - 1
+    DEC AX
+    MOV BX, AX
+    PUSH BX ; Save Index
+    
+    ; 1. Update Food Name
+    PRINT msg_food
+    GET_STRING input_temp
+    NEWLINE
+    POP BX
+    PUSH BX
+    ; Check if empty input (length at input_temp+1)
+    MOV AL, [input_temp+1]
+    CMP AL, 0
+    JE SKIP_FOOD
+    ; If not empty, update
+    MOV AX, BX
+    MOV DX, 30
+    MUL DX
+    LEA DI, order_foods
+    ADD DI, AX
+    LEA SI, input_temp
+    CALL COPY_TO_STORAGE
+SKIP_FOOD:
+
+    ; 2. Update Quantity
+    PRINT msg_qty
+    GET_STRING input_temp
+    NEWLINE
+    POP BX
+    PUSH BX
+    MOV AL, [input_temp+1]
+    CMP AL, 0
+    JE SKIP_QTY
+    LEA SI, input_temp
+    CALL STR_TO_NUM
+    LEA DI, order_qtys
+    ADD DI, BX
+    MOV [DI], AL
+SKIP_QTY:
+
+    ; 3. Update Price
+    PRINT msg_price
+    GET_STRING input_temp
+    NEWLINE
+    POP BX
+    PUSH BX
+    MOV AL, [input_temp+1]
+    CMP AL, 0
+    JE SKIP_PRICE
+    LEA SI, input_temp
+    CALL STR_TO_NUM
+    LEA DI, order_prices
+    SHL BX, 1
+    ADD DI, BX
+    MOV [DI], AX
+SKIP_PRICE:
+
+    ; 4. Update Address
+    PRINT msg_addr
+    GET_STRING input_temp
+    NEWLINE
+    POP BX
+    PUSH BX
+    MOV AL, [input_temp+1]
+    CMP AL, 0
+    JE SKIP_ADDR
+    MOV AX, BX
+    MOV DX, 50
+    MUL DX
+    LEA DI, order_addresses
+    ADD DI, AX
+    LEA SI, input_temp
+    CALL COPY_TO_STORAGE
+SKIP_ADDR:
+
+    ; 5. Update Contact
+    PRINT msg_contact
+    GET_STRING input_temp
+    NEWLINE
+    POP BX
+    PUSH BX
+    MOV AL, [input_temp+1]
+    CMP AL, 0
+    JE SKIP_CONT
+    MOV AX, BX
+    MOV DX, 15
+    MUL DX
+    LEA DI, order_contacts
+    ADD DI, AX
+    LEA SI, input_temp
+    CALL COPY_TO_STORAGE
+SKIP_CONT:
+
+    POP BX ; Clear stack
+    PRINT_COLORED msg_upd_succ, 0Ah      ; Green
+    JMP UPD_EXIT
+
+UPD_NO_DATA:
+    PRINT msg_no_orders
+    JMP UPD_EXIT
+
+UPD_INVALID:
+    PRINT_COLORED msg_del_err, 0Ch       ; Red (reuse)
+
+UPD_EXIT:
+    PRINT msg_wait_main
+    MOV AH, 07H
+    INT 21H
+    RET
+UPDATE_ORDER_PROC ENDP
 
 DELETE_ORDER_PROC PROC
     CLEAR_SCREEN
@@ -504,10 +933,99 @@ DELETE_ORDER_PROC PROC
     
     ; Check if any orders exist
     CMP order_count, 0
-    JNE DEL_CHECK_ID
-    JMP DEL_NO_DATA  ; FIXED: Use JMP to reach far label
+    JNE DEL_SHOW_ORDERS
+    JMP DEL_NO_DATA
+
+DEL_SHOW_ORDERS:
+    ; Display all orders first
+    PRINT table_header
+    
+    MOV CL, order_count
+    MOV CH, 0
+    MOV BX, 0
+    
+DEL_DISPLAY_LOOP:
+    PUSH CX
+    
+    ; Print ID
+    MOV AX, BX
+    INC AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Food
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 30
+    MUL DX
+    LEA DX, order_foods
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    PRINT spacer
+    
+    ; Print Qty
+    LEA SI, order_qtys
+    ADD SI, BX
+    MOV AL, [SI]
+    MOV AH, 0
+    PUSH AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Price
+    PUSH BX
+    MOV AX, BX
+    SHL AX, 1
+    LEA SI, order_prices
+    ADD SI, AX
+    MOV AX, [SI]
+    MOV DX, AX
+    CALL NUM_TO_STR
+    PRINT spacer
+    POP BX
+    
+    ; Print Total
+    POP AX
+    MUL DX
+    CALL NUM_TO_STR
+    PRINT spacer
+    
+    ; Print Address
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 50
+    MUL DX
+    LEA DX, order_addresses
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    PRINT spacer
+    
+    ; Print Contact
+    PUSH BX
+    MOV AX, BX
+    MOV DX, 15
+    MUL DX
+    LEA DX, order_contacts
+    ADD DX, AX
+    MOV AH, 09H
+    INT 21H
+    POP BX
+    
+    NEWLINE
+    INC BX
+    POP CX
+    DEC CX
+    CMP CX, 0
+    JE DEL_DISPLAY_DONE
+    JMP DEL_DISPLAY_LOOP
+DEL_DISPLAY_DONE:
 
 DEL_CHECK_ID:
+    NEWLINE
     ; Get ID to delete
     PRINT msg_del_id
     GET_STRING input_temp
@@ -515,6 +1033,12 @@ DEL_CHECK_ID:
     
     LEA SI, input_temp
     CALL STR_TO_NUM ; AX = ID
+    
+    ; Check if user wants to go back (ID = 0)
+    CMP AX, 0
+    JNE DEL_CONTINUE
+    JMP DEL_EXIT
+DEL_CONTINUE:
     
     ; Validate ID (Must be > 0 and <= order_count)
     CMP AX, 0
@@ -610,6 +1134,28 @@ SHIFT_LOOP_START:
     MOV CX, 50
     REP MOVSB
     
+    ; Shift Contact (15 bytes)
+    POP BX      ; Restore Index (from Address Push)
+    PUSH BX
+    
+    ; Dest: BX * 15
+    MOV AX, BX
+    MOV DX, 15
+    MUL DX
+    LEA DI, order_contacts
+    ADD DI, AX
+    
+    ; Src: (BX+1) * 15
+    MOV AX, BX
+    INC AX
+    MOV DX, 15
+    MUL DX
+    LEA SI, order_contacts
+    ADD SI, AX
+    
+    MOV CX, 15
+    REP MOVSB
+    
     POP BX
     INC BX
     POP CX
@@ -622,7 +1168,7 @@ SHIFT_LOOP_START:
 
 DEL_DEC_COUNT:
     DEC order_count
-    PRINT msg_del_succ
+    PRINT_COLORED msg_del_succ, 0Ah      ; Green
     JMP DEL_EXIT
 
 DEL_NO_DATA:
@@ -630,10 +1176,10 @@ DEL_NO_DATA:
     JMP DEL_EXIT
     
 DEL_INVALID:
-    PRINT msg_del_err
+    PRINT_COLORED msg_del_err, 0Ch       ; Red
 
 DEL_EXIT:
-    PRINT msg_wait
+    PRINT msg_wait_main
     MOV AH, 07H
     INT 21H
     RET
